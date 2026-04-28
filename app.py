@@ -4,25 +4,79 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-messages = []
+tasks = []
 
 @app.route("/", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
-        msg = request.form.get("msg")
-        if msg:
-            messages.append(msg)
+        task = request.form.get("task")
+        if task:
+            tasks.append(task)
         return redirect("/")
 
-    msg_list = "".join([f"<li>{m}</li>" for m in messages])
+    task_list = "".join([
+        f"<li>{t} <a href='/delete/{i}'>❌</a></li>"
+        for i, t in enumerate(tasks)
+    ])
 
     return f"""
-    <html>
-    <head>
-        <title>GitOps App</title>
-        <style>
-            body {{
-                font-family: Arial;
-                background: #f4f6f9;
-                text-align: center;
-                padding: 40px;
+<html>
+<head>
+<title>TODO App</title>
+<style>
+body {{
+    font-family: Arial;
+    background: #f4f6f9;
+    text-align: center;
+    padding: 40px;
+}}
+.container {{
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 400px;
+    margin: auto;
+}}
+input {{
+    padding: 10px;
+    width: 70%;
+}}
+button {{
+    padding: 10px;
+    background: green;
+    color: white;
+    border: none;
+}}
+li {{
+    list-style: none;
+    margin: 5px;
+}}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📝 TODO App</h1>
+
+    <form method="POST">
+        <input name="task" placeholder="Enter task..." />
+        <button>Add</button>
+    </form>
+
+    <ul>{task_list}</ul>
+
+    <p>Pod: {socket.gethostname()}</p>
+    <p>Time: {datetime.now()}</p>
+</div>
+
+</body>
+</html>
+"""
+
+@app.route("/delete/<int:index>")
+def delete(index):
+    if index < len(tasks):
+        tasks.pop(index)
+    return redirect("/")
+
+app.run(host="0.0.0.0", port=8080)
