@@ -56,7 +56,7 @@ li {{
 <body>
 
 <div class="container">
-    <h1>📝 TODO App - live updates </h1>
+    <h1>📝 TODO App - live</h1>
 
     <form method="POST">
         <input name="task" placeholder="Enter task..." />
